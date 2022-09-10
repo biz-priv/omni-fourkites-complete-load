@@ -1,0 +1,36 @@
+{
+  "name": "omni-fourkites-complete-load",
+  "version": "1.0.0",
+  "description": "omni-fourkites-complete-load",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bizcloud-experts/omni-fourkites-complete-load.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/bizcloud-experts/omni-fourkites-complete-load/issues"
+  },
+  "homepage": "https://github.com/bizcloud-experts/omni-fourkites-complete-load#readme",
+  "dependencies": {
+    "aws-sdk": "^2.1205.0",
+    "axios": "^0.27.2",
+    "excel4node": "^1.8.0",
+    "fast-csv": "^4.3.6",
+    "fs": "0.0.1-security",
+    "nodemailer": "^6.7.8",
+    "pg": "^8.8.0",
+    "serverless-offline": "^9.3.0",
+    "serverless-prune-plugin": "^2.0.1",
+    "serverless-pseudo-parameters": "^2.6.1",
+    "serverless-step-functions": "2.32.0",
+    "xlsx": "^0.18.5"
+  }
+}

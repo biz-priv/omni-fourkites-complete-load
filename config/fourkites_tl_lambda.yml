@@ -1,0 +1,33 @@
+FourKitesDispatchTlLambda:
+  handler: src/tl-dispatch/index.handler
+  description: omni fourkites tl dispatch - ${self:provider.stage}
+  memorySize: 512
+  timeout: 900
+
+  environment:
+    DB_USER: ${ssm:/omni-dw/${self:provider.stage}/db/user}
+    DB_PASSWORD: ${ssm:/omni-dw/${self:provider.stage}/db/password}
+    DB_DATABASE: ${ssm:/omni-dw/${self:provider.stage}/db/name}
+    DB_HOST: ${ssm:/omni-dw/${self:provider.stage}/db/host}
+    DB_PORT: ${ssm:/omni-dw/${self:provider.stage}/db/port}
+    REGION: ${self:provider.region}
+    FOURKITES_URL: ${ssm:/omni-dw-fourkites/${self:provider.stage}/url}    
+    FOURKITES_USERNAME: ${ssm:/omni-dw-fourkites/${self:provider.stage}/auth/username}
+    FOURKITES_PASSWORD: ${ssm:/omni-dw-fourkites/${self:provider.stage}/auth/password}
+    FOURKITES_TABLENAME: ${ssm:/omni-dw-fourkites/${self:provider.stage}/tlDispatch/data/table}
+    S3_BUCKET_NAME: ${ssm:/omni-dw-fourkites/${self:provider.stage}/s3/bucket-name}
+
+  package:
+    include:
+    - 'src/tl-dispatch/**'
+    - 'src/shared/**'
+
+  # events:  
+    # - schedule:
+    #     name: omni-dw-fourkites-tl-dispatch-${self:provider.stage}
+    #     description: 'schedule cloud watch event on fourkites tl dispatch lambda for every 30 minutes'
+    #     rate: rate(30 minutes)
+      # - http:
+      #     path: fourkitesLambda
+      #     method: post
+      #     cors: true
