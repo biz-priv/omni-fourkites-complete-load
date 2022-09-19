@@ -6,6 +6,7 @@ from datetime import datetime,timezone
 import boto3
 import requests
 from requests.auth import HTTPBasicAuth
+import xlsxwriter
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 client = boto3.client('dynamodb')
@@ -13,6 +14,7 @@ from boto3.dynamodb.conditions import Key, Attr
 
 from src.common import modify_date
 from src.common import execute_db_query
+from src.common import s3UploadObject
 
 def handler(event, context):
     try :
@@ -20,6 +22,8 @@ def handler(event, context):
         query = 'Select shipper_name,reference_nbr,op_carrier_scac,truck_trailer_nbr,truck_trailer_nbr,latitude,longitude,city,state,event_date,pod_date,file_nbr from fourkites_tl where message_sent = '''
         queryData = execute_db_query(query)
         logger.info("queryData Response from redshift : ", queryData)
+        s3BucketName = ''
+        # startXlsxS3Process(s3BucketName, queryData, 'liveData')
         for results in queryData:
             temp = recordsConv(results,con)
             records_list.append(temp)
@@ -28,11 +32,44 @@ def handler(event, context):
         payload = json.dumps(shipment_records)
         logger.info("Payload loaded into Fourkites API  :{}".format(payload))
         headers = {'content-type': 'application/json'}
-        r = requests.post(url, headers=headers,data=payload,auth=HTTPBasicAuth(os.environ['fourkites_username'],os.environ['fourkites_password']))
-        logger.info("Response from fourkites API :{}".format(r))
+        # r = requests.post(url, headers=headers,data=payload,auth=HTTPBasicAuth(os.environ['fourkites_username'],os.environ['fourkites_password']))
+        # logger.info("Response from fourkites API :{}".format(r))
     except Exception as e:
             logging.exception("ApiPostError: {}".format(e))
             raise ApiPostError(json.dumps({"httpStatus": 400, "message": "Api post error."}))    
+
+def startXlsxS3Process(s3BucketName, requestData, path):
+    for reqData in requestData:
+        dataToUpload =  prepareSpreadsheet(reqData)
+        uploadFileToS3(s3BucketName, dataToUpload, path)
+        
+def prepareSpreadsheet(reqData):
+    try:    
+        workbook = xlsxwriter.Workbook('sample.xlsx')
+        worksheet = workbook.add_worksheet()
+        col = 0
+
+        for row, data in enumerate(reqData):
+            worksheet.write_row(row, col, data)
+
+        workbook.close()
+        return workbook
+    except Exception as e:
+        logging.exception("WorkbookError: {}".format(e))
+        raise WorkBookCreationError(json.dumps({"httpStatus": 400, "message": "Workbook creation error."}))
+    # wb = XLSX.utils.book_new()
+    # sheetData = XLSX.utils.json_to_sheet(reqData)
+    # XLSX.utils.book_append_sheet(wb, sheetData, 'Sheet 1')
+    # sheetDataBuffer = await XLSX.write(wb, { bookType: 'csv', type: 'buffer', bookSST: false })
+    # sheetDataBuffer
+
+def uploadFileToS3(s3BucketName, sheetDataBuffer, path):
+    try:
+        s3UploadObject(sheetDataBuffer,path,s3BucketName,"key")
+    except Exception as e:
+        logging.exception("RecordConversionError: {}".format(e))
+        raise UploadFileS3Error(json.dumps({"httpStatus": 400, "message": "Upload File to S3 error."}))
+    
 
 def recordsConv(y,con):
     try:
@@ -125,4 +162,6 @@ def updateDynamoDB(shipper,billoflading,operatingCarrierScac,truckNumber,trailer
 
 class RecordConversionError(Exception): pass
 class ApiPostError(Exception): pass
-class UpdateDynamodbError(Excpetion): pass
+class UpdateDynamodbError(Exception): pass
+class WorkBookCreationError(Exception): pass
+class UploadFileS3Error(Exception): pass

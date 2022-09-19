@@ -15,14 +15,18 @@ function:
   #       description: 'schedule cloud watch event on fourkites tl dispatch lambda for every 30 minutes'
   #       rate: rate(30 minutes)
   environment:
-    db_username: ${ssm:/omni-dw/${self:provider.stage}/db/user~true}
-    db_password: ${ssm:/omni-dw/${self:provider.stage}/db/password~true}
+    db_username: ${ssm:/omni-dw/${self:provider.stage}/db/user}
+    db_password: ${ssm:/omni-dw/${self:provider.stage}/db/password}
     db_name: ${ssm:/omni-dw/${self:provider.stage}/db/name}
-    db_host: ${ssm:/omni-dw/${self:provider.stage}/db/host~true}
+    db_host: ${ssm:/omni-dw/${self:provider.stage}/db/host}
     db_port: ${ssm:/omni-dw/${self:provider.stage}/db/port} 
     REGION: ${self:provider.region}
     fourkites_url: ${ssm:/omni-dw-fourkites/${self:provider.stage}/url}    
     fourkites_username: ${ssm:/omni-dw-fourkites/${self:provider.stage}/auth/username}
     fourkites_password: ${ssm:/omni-dw-fourkites/${self:provider.stage}/auth/password}
     fourkites_tablename: ${ssm:/omni-dw-fourkites/${self:provider.stage}/tlDispatch/table}
-    
+  # events:
+  #   - http:
+  #       path: tl-dispatch
+  #       method: get
+  #       cors: true  

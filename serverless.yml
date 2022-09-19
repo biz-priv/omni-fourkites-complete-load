@@ -5,8 +5,9 @@ provider:
   runtime: python3.7
   stage: ${opt:stage, 'dev'}
   region: us-east-1
-  deploymentBucket: ${ssm:/omni-dw/${self:provider.stage}/sls/deployment/bucket}
-  role: ${ssm:/omni-dw/${self:provider.stage}/lambda/role}  
+  deploymentBucket: omni-fkt-load-test
+  iam:
+    role: ${ssm:/omni-dw/${self:provider.stage}/lambda/role}  
   vpc:
     securityGroupIds:
       - ${ssm:/omni-dw/${self:provider.stage}/lambda/sgId}
@@ -39,8 +40,8 @@ functions:
   ltl-dispatch: ${file(config/functions/ltl-dispatch.yml):function}
   tl-dispatch: ${file(config/functions/tl-dispatch.yml):function}
 
-stepFunctions:
-  stateMachines:
-    fourkites-tl-state-machine: ${file(config/functions/fourkites-tl-state-machine.yml):stateMachine}
+# stepFunctions:
+#   stateMachines:
+#     fourkites-tl-state-machine: ${file(config/functions/fourkites-tl-state-machine.yml):stateMachine}
 
     

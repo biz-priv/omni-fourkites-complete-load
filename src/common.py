@@ -54,7 +54,23 @@ def validateDynamoDB(filenumber):
     except Exception as e:
         logging.exception("ValidateDynamodbError: {}".format(e))
         raise ValidateDynamodbError(json.dumps({"httpStatus": 501, "message": "Validate Dynamo error."}))
+    
+def s3UploadObject(queryData,filename,bucket,key):
+    try:
+        s3 = boto3.resource('s3')
+    except Exception as e:
+        logging.exception("S3InitializationError: {}".format(e))
+        raise InitializationError(json.dumps({"httpStatus": 400, "message": "s3 initialization error."})) 
+    try:
+        with open(filename, 'w', encoding='utf-8') as f:
+            f.write(str(queryData))
+        s3.meta.client.upload_file(filename, bucket, key)
+    except Exception as e:
+        logging.exception("UpdateFileError: {}".format(e))
+        raise UpdateFileError(json.dumps({"httpStatus": 400, "message": "Update file error."}))    
         
 class DatabaseError(Exception): pass
 class ValidateDynamodbError(Exception): pass
 class DateConversionError(Exception): pass
+class InitializationError(Exception): pass
+class UpdateFileError(Exception): pass

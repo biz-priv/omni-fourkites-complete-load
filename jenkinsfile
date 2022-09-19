@@ -1,0 +1,54 @@
+pipeline {
+    stages {
+        stage('Set parameters') {
+            steps {
+                script{
+                    echo "GIT_BRANCH: ${GIT_BRANCH}"
+                    echo sh(script: 'env|sort', returnStdout: true)
+                    if ("${GIT_BRANCH}".contains("feature") || "${GIT_BRANCH}".contains("bugfix") || "${GIT_BRANCH}".contains("develop")) {
+                        env.ENVIRONMENT=env.getProperty("environment_develop")
+                    } else if ("${GIT_BRANCH}".contains("master") || "${GIT_BRANCH}".contains("hotfix")){
+                        env.ENVIRONMENT=env.getProperty("environment_prod")
+                    }
+                    sh """
+                    echo "Environment: "${env.ENVIRONMENT}
+                    """
+                }
+            }
+        }
+        stage('Code Scan - Python') {
+            steps{
+                script {
+                    sh '''
+                    eval $(pylint --rcfile=pylint.cfg $(find . -type f -path '*/src/*.py')  --output-format=parseable -r y > pylint.log)
+                    cat pylint.log
+                    pylint-fail-under --fail_under 9.0 --rcfile=pylint.cfg $(find . -type f -path '*/src/*.py')  --output-format=parseable -r y
+                    '''
+                }
+            }
+        }
+        stage('Omni Deploy'){
+            when {
+                anyOf {
+                    branch 'master';
+                    branch 'develop';
+                    branch 'hotfix/*';
+                    branch 'dummy-deploy-test';
+                }
+                expression {
+                    return true;
+                }
+            }
+            steps {
+                withAWS(credentials: 'omni-aws-creds'){
+                    sh """
+                    npm i serverless@2.11.1
+                    npm i
+                    serverless --version
+                    sls deploy -s ${env.ENVIRONMENT}
+                    """
+                }
+            }
+        }
+    }
+}

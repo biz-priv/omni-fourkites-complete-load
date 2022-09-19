@@ -20,8 +20,9 @@
   },
   "homepage": "https://github.com/bizcloud-experts/omni-fourkites-complete-load#readme",
   "dependencies": {
+    "serverless": "2.61.0",
+    "serverless-layers": "^2.4.0",
     "serverless-pseudo-parameters": "^2.6.1",
-    "serverless-step-functions": "2.32.0",
-    "serverless-layers": "^2.4.0"
+    "serverless-step-functions": "2.32.0"
   }
 }
