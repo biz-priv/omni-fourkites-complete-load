@@ -1,4 +1,5 @@
 pipeline {
+    agent { label 'ecs' }
     stages {
         stage('Set parameters') {
             steps {
