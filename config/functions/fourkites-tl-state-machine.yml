@@ -20,5 +20,5 @@ stateMachine:
       SuccessState:
         Type: Succeed
   events:  
-    # - schedule: cron(0 12,2 * * ? *)
+    - schedule: cron(0 12,2 * * ? *)
     # - schedule: cron(*/30 * * * *)  //every 30 minutes

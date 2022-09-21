@@ -40,8 +40,8 @@ functions:
   ltl-dispatch: ${file(config/functions/ltl-dispatch.yml):function}
   tl-dispatch: ${file(config/functions/tl-dispatch.yml):function}
 
-# stepFunctions:
-#   stateMachines:
-#     fourkites-tl-state-machine: ${file(config/functions/fourkites-tl-state-machine.yml):stateMachine}
+stepFunctions:
+  stateMachines:
+    fourkites-tl-state-machine: ${file(config/functions/fourkites-tl-state-machine.yml):stateMachine}
 
     
