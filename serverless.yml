@@ -1,0 +1,47 @@
+service: omni-fourkites-load-test
+
+provider:
+  name: aws
+  runtime: python3.7
+  stage: ${opt:stage, 'dev'}
+  region: us-east-1
+  deploymentBucket: omni-fkt-load-test
+  iam:
+    role: ${ssm:/omni-dw/${self:provider.stage}/lambda/role}  
+  vpc:
+    securityGroupIds:
+      - ${ssm:/omni-dw/${self:provider.stage}/lambda/sgId}
+    subnetIds:
+      - ${ssm:/omni-dw/${self:provider.stage}/lambda/subnetA}
+  stackTags: 
+    Application: Fourkites
+    CreateBy: BizCloudExperts
+    Environment: ${self:provider.stage} 
+
+custom: 
+  serverless-layers:
+    functions:
+      - ltl-dispatch
+      - tl-dispatch   
+    dependenciesPath: ./requirements.txt
+    
+plugins:
+  - serverless-layers
+  - serverless-pseudo-parameters
+  - serverless-step-functions
+
+package:
+  individually: true
+  exclude:
+  - '**/*'
+  - serverless.yml
+
+functions:
+  ltl-dispatch: ${file(config/functions/ltl-dispatch.yml):function}
+  tl-dispatch: ${file(config/functions/tl-dispatch.yml):function}
+
+stepFunctions:
+  stateMachines:
+    fourkites-tl-state-machine: ${file(config/functions/fourkites-tl-state-machine.yml):stateMachine}
+
+    

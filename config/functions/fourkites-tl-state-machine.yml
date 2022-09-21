@@ -1,0 +1,24 @@
+stateMachine:
+  name: fourkites-tl-state-machine-${self:provider.stage}
+  definition:
+    Comment: 'State machine for fourkites tl'
+    StartAt: PublishEvents
+    States:
+      PublishEvents:
+        Type: Task
+        Resource: "arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:${self:service}-tl-dispatch-${self:provider.stage}"
+        Next: EndChoice
+      EndChoice: 
+        Type: Choice
+        Choices:
+          - Variable: "$.hasMoreData"
+            StringEquals: "false"
+            Next: SuccessState
+          - Variable: "$.hasMoreData"
+            StringEquals: "true"
+            Next: PublishEvents
+      SuccessState:
+        Type: Succeed
+  events:  
+    - schedule: cron(0 12,2 * * ? *)
+    # - schedule: cron(*/30 * * * *)  //every 30 minutes
