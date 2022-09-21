@@ -14,7 +14,7 @@ pipeline {
                     sh """
                     echo "Environment: "${env.ENVIRONMENT}
                     """
-                }
+                } 
             }
         }
         stage('Omni Deploy'){
