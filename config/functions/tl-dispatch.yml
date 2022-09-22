@@ -8,6 +8,7 @@ function:
   package:
     include:
     - src/tl-dispatch.py
+    - src/common.py
     - psycopg2/*
     - xlsxwriter/*
   # events:  
