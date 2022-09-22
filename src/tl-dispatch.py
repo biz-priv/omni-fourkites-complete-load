@@ -6,7 +6,7 @@ from datetime import datetime,timezone
 import boto3
 import requests
 from requests.auth import HTTPBasicAuth
-import XlsxWriter
+import xlsxwriter
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 client = boto3.client('dynamodb')
@@ -45,7 +45,7 @@ def startXlsxS3Process(s3BucketName, requestData, path):
         
 def prepareSpreadsheet(reqData):
     try:    
-        workbook = XlsxWriter.Workbook('sample.xlsx')
+        workbook = xlsxwriter.Workbook('sample.xlsx')
         worksheet = workbook.add_worksheet()
         col = 0
 
