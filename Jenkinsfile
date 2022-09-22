@@ -40,7 +40,6 @@ pipeline {
                     sh """
                     npm i serverless@2.61.0
                     npm i
-                    sudo apt-get install libpq-dev
                     serverless --version
                     python --version
                     sls deploy -s ${env.ENVIRONMENT}
