@@ -13,25 +13,28 @@ client = boto3.client('dynamodb')
 from boto3.dynamodb.conditions import Key, Attr
 
 from src.common import modify_date
-from src.common import execute_db_query
+from src.common import execute_db_query_from_file
 from src.common import s3UploadObject
 
 def handler(event, context):
     try :
         logger.info("Event: {}".format(json.dumps(event)))
-        query = 'Select shipper_name,reference_nbr,op_carrier_scac,truck_trailer_nbr,truck_trailer_nbr,latitude,longitude,city,state,event_date,pod_date,file_nbr from fourkites_tl where message_sent = '''
-        queryData = execute_db_query(query)
-        logger.info("queryData Response from redshift : ", queryData)
+        # query = 'Select shipper_name,reference_nbr,op_carrier_scac,truck_trailer_nbr,truck_trailer_nbr,latitude,longitude,city,state,event_date,pod_date,file_nbr from fourkites_tl where message_sent = '''
+        # queryData = execute_db_query(query)
+        # queryData = execute_db_query_from_file()
+        queryData = [{"shipper_name": "test1", "reference_nbr": "123", "op_carrier_scac":"test1", "truck_trailer_nbr": "trucktest" },{"shipper_name": "test2", "reference_nbr": "1234", "op_carrier_scac":"test2", "truck_trailer_nbr": "trucktest2" }]
+        logger.info("queryData Response from redshift :{}".format(queryData))
         s3BucketName = ''
-        # startXlsxS3Process(s3BucketName, queryData, 'liveData')
-        for results in queryData:
-            temp = recordsConv(results,con)
-            records_list.append(temp)
+        startXlsxS3Process(s3BucketName, queryData, 'liveData')
+        # records_list = []
+        # for results in queryData:
+        #     temp = recordsConv(results,con)
+        #     records_list.append(temp)
         
-        shipment_records = {'updates':records_list}
-        payload = json.dumps(shipment_records)
-        logger.info("Payload loaded into Fourkites API  :{}".format(payload))
-        headers = {'content-type': 'application/json'}
+        # shipment_records = {'updates':records_list}
+        # payload = json.dumps(shipment_records)
+        # logger.info("Payload loaded into Fourkites API  :{}".format(payload))
+        # headers = {'content-type': 'application/json'}
         # r = requests.post(url, headers=headers,data=payload,auth=HTTPBasicAuth(os.environ['fourkites_username'],os.environ['fourkites_password']))
         # logger.info("Response from fourkites API :{}".format(r))
     except Exception as e:
@@ -41,11 +44,13 @@ def handler(event, context):
 def startXlsxS3Process(s3BucketName, requestData, path):
     for reqData in requestData:
         dataToUpload =  prepareSpreadsheet(reqData)
-        uploadFileToS3(s3BucketName, dataToUpload, path)
+        logger.info("dataToUpload :{}".format(dataToUpload))
+        # uploadFileToS3(s3BucketName, dataToUpload, path)
         
 def prepareSpreadsheet(reqData):
     try:    
-        workbook = xlsxwriter.Workbook('sample.xlsx')
+        logger.info("reqData :{}".format(reqData));
+        workbook = xlsxwriter.Workbook('demo.xlsx')
         worksheet = workbook.add_worksheet()
         col = 0
 
@@ -53,6 +58,7 @@ def prepareSpreadsheet(reqData):
             worksheet.write_row(row, col, data)
 
         workbook.close()
+        logger.info("workbook :{}".format(workbook))
         return workbook
     except Exception as e:
         logging.exception("WorkbookError: {}".format(e))
@@ -98,13 +104,13 @@ def recordsConv(y,con):
         deliveredAt = record["deliveredAt"]
         file_nbr = y[11]
 
-        updateDynamoDB(shipper,billoflading,operatingCarrierScac,truckNumber,trailerNumber,latitude,longitude,city,state,locatedAt,deliveredAt,file_nbr)
-        cur = con.cursor()
-        cur.execute(f"UPDATE public.fourkites_tl SET message_sent = 'Y' where file_nbr = '{file_nbr}' and reference_nbr = '{billoflading}'")
-        con.commit()
+        # updateDynamoDB(shipper,billoflading,operatingCarrierScac,truckNumber,trailerNumber,latitude,longitude,city,state,locatedAt,deliveredAt,file_nbr)
+        # cur = con.cursor()
+        # cur.execute(f"UPDATE public.fourkites_tl SET message_sent = 'Y' where file_nbr = '{file_nbr}' and reference_nbr = '{billoflading}'")
+        # con.commit()
         return record
-        cur.close()
-        con.close()
+        # cur.close()
+        # con.close()
     except Exception as e:
         logging.exception("RecordConversionError: {}".format(e))
         raise RecordConversionError(json.dumps({"httpStatus": 400, "message": "Record conversion error."}))
