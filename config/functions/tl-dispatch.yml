@@ -11,6 +11,7 @@ function:
     - src/common.py
     - psycopg2/*
     - xlsxwriter/*
+    - script.sql
   # events:  
   #   - schedule:
   #       name: omni-dw-fourkites-tl-dispatch-${self:provider.stage}
