@@ -1,3 +1,10 @@
+# """
+# * File: src\common.py
+# * Project: Omni-fourkites-complete-load
+# * Author: Bizcloud Experts
+# * Date: 2022-09-19
+# * Confidential and Proprietary
+# """
 import os
 import json
 import boto3
