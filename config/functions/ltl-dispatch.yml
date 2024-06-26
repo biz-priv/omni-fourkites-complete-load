@@ -5,6 +5,8 @@ function:
   description: omni fourkites ltl dispatch - ${self:provider.stage}
   memorySize: 256
   timeout: 60
+  tags:
+    Name : ltl-dispatch
   package:
     include:
     - src/ltl-dispatch.py

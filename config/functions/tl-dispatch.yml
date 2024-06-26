@@ -5,6 +5,8 @@ function:
   description: omni fourkites tl dispatch - ${self:provider.stage}
   memorySize: 256
   timeout: 60
+  tags:
+    Name : tl-dispatch
   package:
     include:
     - src/tl-dispatch.py
